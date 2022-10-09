@@ -6,11 +6,11 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket = "fumi-sre-terraform"
-    key    = "prod/terraform.tfstate"
-    region = "ap-northeast-1"
-  }
+#   backend "s3" {
+#     bucket = "fumi-sre-terraform"
+#     key    = "prod/terraform.tfstate"
+#     region = "ap-northeast-1"
+#   }
 }
 
 provider "aws" {

@@ -10,6 +10,9 @@ resource "aws_cloudfront_distribution" "www_s3_distribution" {
       origin_protocol_policy = "http-only"
       origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
     }
+    s3_origin_config {
+        origin_access_identity = aws_cloudfront_origin_access_identity.www_s3_distribution.cloudfront_access_identity_path
+    }
   }
 
   enabled             = true
@@ -60,6 +63,10 @@ resource "aws_cloudfront_distribution" "www_s3_distribution" {
   tags = var.common_tags
 }
 
+resource "aws_cloudfront_origin_access_identity" "www_s3_distribution" {
+  comment = "www.${var.domain_name}"
+}
+
 # Cloudfront S3 for redirect to www.
 resource "aws_cloudfront_distribution" "root_s3_distribution" {
   origin {
@@ -71,8 +78,10 @@ resource "aws_cloudfront_distribution" "root_s3_distribution" {
       origin_protocol_policy = "http-only"
       origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
     }
+    s3_origin_config {
+        origin_access_identity = aws_cloudfront_origin_access_identity.www_s3_distribution.cloudfront_access_identity_path
+    }
   }
-
   enabled         = true
   is_ipv6_enabled = true
 
