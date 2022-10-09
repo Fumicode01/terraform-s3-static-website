@@ -1,6 +1,6 @@
-domain_name = "yourdomain.com"
-bucket_name = "yourdomain.com"
+domain_name = "fumi-sre.com"
+bucket_name = "fumi-sre.com"
 
 common_tags = {
-  Project = "yourdomain"
+  Project = "fumi-sre"
 }

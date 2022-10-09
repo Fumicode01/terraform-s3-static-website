@@ -11,3 +11,9 @@ variable "bucket_name" {
 variable "common_tags" {
   description = "Common tags you want applied to all components."
 }
+
+
+variable "wildcard_enable" {
+  description = "Variable that allow us to choose the possibility of not use wildcard certificate"
+  default     = false
+}
