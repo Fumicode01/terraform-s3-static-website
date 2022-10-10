@@ -1,8 +1,27 @@
 # S3 bucket for website.
+
+data "aws_iam_policy_document" "www_s3_policy" {
+  statement {
+    sid = "1"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.www_bucket.arn}/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_cloudfront_origin_access_identity.www_s3_distribution.iam_arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "www_bucket_policy" {
+  bucket = aws_s3_bucket.www_bucket.id
+  policy = data.aws_iam_policy_document.www_s3_policy.json
+}
+
 resource "aws_s3_bucket" "www_bucket" {
   bucket = "www.${var.bucket_name}"
-#   acl    = "public-read"
-  acl    = "private"
+  acl    = "public-read"
+#   acl    = "private"
 #   policy = templatefile("templates/s3-policy.json", { bucket = "www.${var.bucket_name}" })
 
   cors_rule {
@@ -20,11 +39,34 @@ resource "aws_s3_bucket" "www_bucket" {
   tags = var.common_tags
 }
 
+
+
+
+
 # S3 bucket for redirecting non-www to www.
+
+data "aws_iam_policy_document" "root_s3_policy" {
+  statement {
+    sid = "1"
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.root_bucket.arn}/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_cloudfront_origin_access_identity.root_s3_distribution.iam_arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "root_bucket_policy" {
+  bucket = aws_s3_bucket.root_bucket.id
+  policy = data.aws_iam_policy_document.root_s3_policy.json
+}
+
 resource "aws_s3_bucket" "root_bucket" {
   bucket = var.bucket_name
-  acl    = "private"
-#   acl    = "public-read"
+#   acl    = "private"
+  acl    = "public-read"
 #   policy = templatefile("templates/s3-policy.json", { bucket = var.bucket_name })
 
   website {

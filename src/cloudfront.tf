@@ -1,19 +1,31 @@
 # Cloudfront distribution for main s3 site.
+
+resource "aws_cloudfront_origin_access_identity" "www_s3_distribution" {
+  comment = "www.${var.domain_name}"
+}
+
+resource "aws_cloudfront_origin_access_identity" "root_s3_distribution" {
+  comment = "www.${var.domain_name}"
+}
 resource "aws_cloudfront_distribution" "www_s3_distribution" {
   origin {
-    domain_name = aws_s3_bucket.www_bucket.website_endpoint
+    # domain_name = aws_s3_bucket.www_bucket.website_endpoint
+    domain_name = aws_s3_bucket.www_bucket.bucket_regional_domain_name
+
     origin_id   = "S3-www.${var.bucket_name}"
 
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
-    }
+    # custom_origin_config {
+    #   http_port              = 80
+    #   https_port             = 443
+    #   origin_protocol_policy = "http-only"
+    #   origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
+    # }
+
     s3_origin_config {
-        origin_access_identity = aws_cloudfront_origin_access_identity.www_s3_distribution.cloudfront_access_identity_path
+      origin_access_identity = aws_cloudfront_origin_access_identity.www_s3_distribution.cloudfront_access_identity_path
     }
   }
+
 
   enabled             = true
   is_ipv6_enabled     = true
@@ -63,23 +75,21 @@ resource "aws_cloudfront_distribution" "www_s3_distribution" {
   tags = var.common_tags
 }
 
-resource "aws_cloudfront_origin_access_identity" "www_s3_distribution" {
-  comment = "www.${var.domain_name}"
-}
-
 # Cloudfront S3 for redirect to www.
 resource "aws_cloudfront_distribution" "root_s3_distribution" {
   origin {
-    domain_name = aws_s3_bucket.root_bucket.website_endpoint
+    # domain_name = aws_s3_bucket.root_bucket.website_endpoint
+    domain_name = aws_s3_bucket.root_bucket.bucket_regional_domain_name
     origin_id   = "S3-.${var.bucket_name}"
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
-    }
+    # custom_origin_config {
+    #   http_port              = 80
+    #   https_port             = 443
+    #   origin_protocol_policy = "http-only"
+    #   origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
+    # }
+
     s3_origin_config {
-        origin_access_identity = aws_cloudfront_origin_access_identity.www_s3_distribution.cloudfront_access_identity_path
+      origin_access_identity = aws_cloudfront_origin_access_identity.root_s3_distribution.cloudfront_access_identity_path
     }
   }
   enabled         = true
